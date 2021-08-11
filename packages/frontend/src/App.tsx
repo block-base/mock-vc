@@ -1,5 +1,10 @@
 import React from "react";
 import axios from "axios";
+import { EthrDID } from "ethr-did";
+
+// DIDの秘密鍵と公開鍵のペアの作成
+const keypair = EthrDID.createKeyPair();
+const ethrDid = new EthrDID({ ...keypair });
 
 function App() {
   const [did, setDid] = React.useState("");
@@ -10,9 +15,8 @@ function App() {
     createDid();
   }, []);
 
-  // TODO: Did作る
   const createDid = () => {
-    setDid("did:ethr:0xB1A25D6E37ad12579801eBb6787636fd63ba87cc");
+    setDid(ethrDid.did);
   };
 
   const issue = async () => {
@@ -25,7 +29,6 @@ function App() {
     const response = await axios.post("http://localhost:5001/blockbase-vcmock-prod/us-central1/verify", { vc });
     setIsVerified(response.data.result);
   };
-
   return (
     <div className="App">
       <h2>DID</h2>
