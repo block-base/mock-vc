@@ -1,0 +1,31 @@
+{
+  "name": "mock-vc",
+  "workspaces": [
+    "packages/**"
+  ],
+  "private": true,
+  "version": "0.1.0",
+  "description": "This is mock vc repository",
+  "main": "index.js",
+  "scripts": {
+    "dev": "run-p dev:*",
+    "dev:functions": "yarn workspace functions dev",
+    "dev:frontend": "yarn workspace frontend dev",
+    "dev:firebase": "firebase emulators:start --only functions"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/block-base/mock-vc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/block-base/mock-vc/issues"
+  },
+  "homepage": "https://github.com/block-base/mock-vc#readme",
+  "devDependencies": {
+    "firebase-tools": "^9.16.0",
+    "npm-run-all": "^4.1.5"
+  }
+}
