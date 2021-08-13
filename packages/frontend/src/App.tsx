@@ -21,8 +21,8 @@ function App() {
 
   const issue = async () => {
     const response = await axios.post("http://localhost:5001/blockbase-vcmock-prod/us-central1/issue", { did });
-
-    setVc(response.data.vc);
+    console.log(response.data.openbadgeV3);
+    setVc(response.data.openbadgeV3);
   };
 
   const verify = async () => {
