@@ -8,26 +8,29 @@ const cors = require("cors")({ origin: true });
 // vcを作成してimageにOpenBadges形式でbakeする
 // Base64で画像を返す
 // 今回はclaimは固定
+
 export const issue = functions.https.onRequest((request, response) => {
   cors(request, response, async () => {
-    const claim = {
-      id: request.body.did,
-      hasCredential: {
-        id: "https://api.badgr.io/public/badges/GsE7QrL6RA-vkprVsHVakw",
-        type: "BadgeClass",
-        name: "good-badges",
-        description: "よくできました",
-        image: "https://api.badgr.io/public/assertions/pbwAU69QTK24Vf58X0SERA/image",
-        issuedOn: "2021-06-29T15:00:00+00:00",
-        achievementType: "Certificate",
-        creater: "did:key:z6Mksm3hensaRNjXMyRWo95UPoDB7DDyZvvXUe6VKszaCJBv",
-        criteria: {
-          narrative:
-            "To earn this badge, the student must complete all coursework and assessment criteria for the BlockBase OpenBadges v3 Program",
+    const claim = (did: string, createrDid: string): CredentialSubject => {
+      return {
+        id: did,
+        hasCredential: {
+          id: "https://api.badgr.io/public/badges/GsE7QrL6RA-vkprVsHVakw",
+          type: "BadgeClass",
+          name: "good-badges",
+          description: "よくできました",
+          image: "https://api.badgr.io/public/assertions/pbwAU69QTK24Vf58X0SERA/image",
+          issuedOn: new Date(),
+          achievementType: "Certificate",
+          creater: createrDid,
+          criteria: {
+            narrative:
+              "To earn this badge, the student must complete all coursework and assessment criteria for the BlockBase OpenBadges v3 Program",
+          },
         },
-      },
+      };
     };
-    const vc = await createVC(claim);
+    const vc = await createVC(claim(request.body.did, "did:key:z6Mksm3hensaRNjXMyRWo95UPoDB7DDyZvvXUe6VKszaCJBv"));
     const openbadgeV3 = `data:image/png;base64,${await bakingPNG(vc)}`;
     response.send({ openbadgeV3 });
   });

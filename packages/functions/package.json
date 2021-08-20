@@ -8,6 +8,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "did-jwt": "^5.6.3",
     "firebase-admin": "^9.8.0",
     "firebase-functions": "^3.14.1",
     "png-itxt": "^2.0.0"
