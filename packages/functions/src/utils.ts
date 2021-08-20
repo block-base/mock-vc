@@ -16,7 +16,7 @@ const filePath = "./assets/good.png";
  * @param {CredentialSubject} credentialSubject
  * @return {Promise<VerifiableCredential>} vc - return VC.
  */
-export async function createVC(credentialSubject: CredentialSubject): Promise<VerifiableCredential> {
+export const createVC = async (credentialSubject: CredentialSubject): Promise<VerifiableCredential> => {
   const claim = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
@@ -47,19 +47,18 @@ export async function createVC(credentialSubject: CredentialSubject): Promise<Ve
     },
   };
   const vc: VerifiableCredential = { ...claim, ...proof };
-  console.log(vc);
   return vc;
-}
+};
 
 /**
  * baking json-ld data to PNG.
  * @param {VerifiableCredential} verifiableCredential
  * @return {Promise<string>} base64Data - return PNG base64.
  */
-export async function bakingPNG(verifiableCredential: VerifiableCredential): Promise<string> {
+export const bakingPNG = async (verifiableCredential: VerifiableCredential): Promise<string> => {
   fs.createReadStream(filePath)
     .pipe(pngitxt.set({ keyword: "openbadges", value: JSON.stringify(verifiableCredential) }, true))
     .pipe(fs.createWriteStream("./output/good-ob.png"));
   const base64Data = fs.readFileSync("./output/good-ob.png", { encoding: "base64" });
   return base64Data;
-}
+};
