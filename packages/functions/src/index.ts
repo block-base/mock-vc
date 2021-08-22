@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import { bakingPNG, createVC } from "./utils";
+import { bakingPNG, createVC, verifyVC } from "./utils";
 
 /* eslint-disable-next-line @typescript-eslint/no-var-requires */
 const cors = require("cors")({ origin: true });
@@ -40,6 +40,7 @@ export const issue = functions.https.onRequest((request, response) => {
 // 検証結果をResultとして返す
 export const verify = functions.https.onRequest((request, response) => {
   cors(request, response, () => {
+    verifyVC(request.body.vc);
     const result = true;
     response.send({ result });
   });

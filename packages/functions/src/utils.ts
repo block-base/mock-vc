@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as stream from "stream";
 import * as pngitxt from "png-itxt";
 import { Buffer } from "buffer";
 import { EthrDID } from "ethr-did";
@@ -61,4 +62,72 @@ export const bakingPNG = async (verifiableCredential: VerifiableCredential): Pro
     .pipe(fs.createWriteStream("./output/good-ob.png"));
   const base64Data = fs.readFileSync("./output/good-ob.png", { encoding: "base64" });
   return base64Data;
+};
+
+export const verifyVC = async (base64Data: string): Promise<boolean> => {
+  getITXT(base64ToBuf(base64Data));
+  return true;
+};
+
+// TODO: readableらへんの挙動はよくわかっていないので調べる
+export const getITXT = async (buf: Buffer): Promise<VerifiableCredential> => {
+  let vc: VerifiableCredential = vcInit();
+  const readable = new stream.Readable();
+  readable.push(buf);
+  readable.push(null);
+  await readable.pipe(
+    pngitxt.get("openbadges", (err, buf) => {
+      if (!err && buf) {
+        vc = JSON.parse(buf.value);
+        console.log(vc);
+      } else {
+        console.error("Please input PNG file!");
+      }
+    })
+  );
+  return vc;
+};
+
+export const base64ToBuf = (base64Data: string): Buffer => {
+  const fileData = base64Data.replace(/^data:\w+\/\w+;base64,/, "");
+  const buf = Buffer.from(fileData, "base64");
+  return buf;
+};
+
+const vcInit = (): VerifiableCredential => {
+  const vc: VerifiableCredential = {
+    "@context": [],
+    id: "",
+    type: [],
+    issuer: "",
+    issuanceDate: new Date(),
+    credentialSubject: {
+      id: "",
+      hasCredential: {
+        id: "",
+        type: "",
+        name: "",
+        description: "",
+        image: "",
+        issuedOn: new Date(),
+        achievementType: "",
+        creater: "",
+        criteria: {
+          narrative: "",
+        },
+      },
+    },
+    credentialStatus: {
+      id: "",
+      type: "",
+    },
+    proof: {
+      type: "",
+      created: new Date(),
+      proofPurpose: "",
+      verificationMethod: "",
+      jws: "",
+    },
+  };
+  return vc;
 };
