@@ -21,7 +21,7 @@ function App() {
 
   const issue = async () => {
     const response = await axios.post("http://localhost:5001/blockbase-vcmock-prod/us-central1/issue", { did });
-    setVc(response.data.openbadgeV3);
+    setVc(response.data.vc);
   };
 
   const verify = async () => {
@@ -30,7 +30,7 @@ function App() {
   };
   return (
     <div className="App">
-      <h2>DID</h2>
+      <h2>Learner DID</h2>
       <p>{did}</p>
       <h2>VCの発行・検証</h2>
       <button onClick={issue}>発行</button>
