@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 declare module "png-itxt" {
   function set(data: data, replaceAll: boolean): any;
 

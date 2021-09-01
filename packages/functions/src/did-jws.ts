@@ -44,12 +44,22 @@ export const verifyJWS = async (
  */
 export const initJWSObj = (jws: string): JWS => {
   const reg = /^([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]*)\.([a-zA-Z0-9_-]+)$/;
-  const j = reg.exec(jws)!;
+  const j = reg.exec(jws);
   const jwsObj: JWS = {
-    Header: j[1],
-    Payload: j[2],
-    Signature: j[3],
+    Header: "",
+    Payload: "",
+    Signature: "",
   };
+  if (j?.length != 4) {
+    console.error("Couldn't Create JWS");
+  } else {
+    const jwsObj: JWS = {
+      Header: j[1],
+      Payload: j[2],
+      Signature: j[3],
+    };
+    return jwsObj;
+  }
   return jwsObj;
 };
 
