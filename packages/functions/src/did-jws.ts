@@ -43,7 +43,7 @@ export const verifyJWS = async (
  * @return {JWS} jwsObj
  */
 export const initJWSObj = (jws: string): JWS => {
-  const reg = /^([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/;
+  const reg = /^([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]*)\.([a-zA-Z0-9_-]+)$/;
   const j = reg.exec(jws)!;
   const jwsObj: JWS = {
     Header: j[1],
@@ -60,5 +60,15 @@ export const initJWSObj = (jws: string): JWS => {
  */
 export const JWSObjToStr = (jws: JWS): string => {
   const jwsStr = jws.Header + "." + jws.Payload + "." + jws.Signature;
+  return jwsStr;
+};
+
+/**
+ * JWSObjToStrWithoutPayload JWS オブジェクトのheader,signatureを連結しstringで返します
+ * @param {JWS} jws
+ * @return {string} jwsStr
+ */
+export const JWSObjToStrWithoutPayload = (jws: JWS): string => {
+  const jwsStr = jws.Header + "." + "." + jws.Signature;
   return jwsStr;
 };

@@ -8,7 +8,7 @@ import { VerificationMethod } from "did-resolver";
 import base64url from "base64url";
 import axios from "axios";
 
-import { CreateJWS, JWSObjToStr, verifyJWS, initJWSObj } from "./did-jws";
+import { CreateJWS, verifyJWS, initJWSObj, JWSObjToStrWithoutPayload } from "./did-jws";
 
 dotenv.config();
 
@@ -57,7 +57,7 @@ export const createVC = async (credentialSubject: CredentialSubject): Promise<Ve
   };
 
   const jwsObj = await CreateJWS(base64url(JSON.stringify(claim)), keypair.privateKey);
-  const vcJws = JWSObjToStr(jwsObj);
+  const vcJws = JWSObjToStrWithoutPayload(jwsObj);
   const proof = {
     proof: {
       type: "EcdsaSecp256k1VerificationKey2019",
@@ -68,6 +68,7 @@ export const createVC = async (credentialSubject: CredentialSubject): Promise<Ve
     },
   };
   const vc: VerifiableCredential = { ...claim, ...proof };
+  console.log(vc);
   return vc;
 };
 
