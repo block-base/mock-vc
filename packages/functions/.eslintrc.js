@@ -24,5 +24,6 @@ module.exports = {
   plugins: ["@typescript-eslint", "import"],
   rules: {
     quotes: ["error", "double"],
+    "new-cap": ["error", { newIsCap: true, capIsNew: false, properties: true, newIsCapExceptions: ["default"] }],
   },
 };

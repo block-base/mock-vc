@@ -1,24 +1,44 @@
 import * as functions from "firebase-functions";
-import { vc } from "./utils";
+import { bakingPNG, createVC, verifyVC } from "./utils";
 
 /* eslint-disable-next-line @typescript-eslint/no-var-requires */
 const cors = require("cors")({ origin: true });
 
-// TODO: 受け取ったDIDに対してvcを発行
-// vcを作成してimageにOpenBadges形式でbakeする
-// Base64で画像を返す
+/**
+ * claimからVCを作成
+ * Base64にして返す
+ */
 export const issue = functions.https.onRequest((request, response) => {
-  cors(request, response, () => {
-    console.log(request.body.did);
-    response.send({ vc });
+  cors(request, response, async () => {
+    const claim = (learnerDid: string, createrDid: string): CredentialSubject => {
+      return {
+        id: learnerDid,
+        achievement: {
+          id: "https://api.badgr.io/public/badges/GsE7QrL6RA-vkprVsHVakw",
+          type: "BadgeClass",
+          name: "good-badges",
+          description: "よくできました",
+          image: "https://api.badgr.io/public/assertions/pbwAU69QTK24Vf58X0SERA/image",
+          issuedOn: new Date().toISOString(),
+          achievementType: "Certificate",
+          creater: createrDid,
+        },
+      };
+    };
+    const vc = await createVC(claim(request.body.did, "did:key:z6Mksm3hensaRNjXMyRWo95UPoDB7DDyZvvXUe6VKszaCJBv"));
+    const vcImg = `data:image/png;base64,${await bakingPNG(vc)}`;
+    response.send({ vc: vcImg });
   });
 });
 
-// TODO: 受け取ったBase64からiTxTをとってきてVCの検証
-// 検証結果をResultとして返す
+/**
+ * 受け取ったBase64からiTxTをとってきてVCの検証
+ * 検証結果をResultとして返す
+ */
 export const verify = functions.https.onRequest((request, response) => {
-  cors(request, response, () => {
-    const result = true;
+  cors(request, response, async () => {
+    const result = await verifyVC(request.body.vc);
+    console.log(result ? "Verified!" : "VerifyFailed!");
     response.send({ result });
   });
 });
