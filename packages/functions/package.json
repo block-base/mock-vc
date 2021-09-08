@@ -27,8 +27,7 @@
     "eslint-plugin-import": "^2.22.0",
     "ethr-did": "^2.1.4",
     "firebase-functions-test": "^0.2.0",
-    "typescript": "^3.8.0",
-    "vp-toolkit": "^0.2.3"
+    "typescript": "^3.8.0"
   },
   "private": true
 }

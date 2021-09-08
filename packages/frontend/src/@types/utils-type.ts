@@ -1,4 +1,4 @@
-interface VerifiablePresentation extends VPClaim {
+export interface VerifiablePresentation extends VPClaim {
   proof: {
     type: string;
     created: string;
@@ -9,13 +9,13 @@ interface VerifiablePresentation extends VPClaim {
   };
 }
 
-interface VPClaim {
+export interface VPClaim {
   "@context": string[];
   type: string;
   verifiableCredential: VerifiableCredential[];
 }
 
-interface VerifiableCredential extends VCClaim {
+export interface VerifiableCredential extends VCClaim {
   proof: {
     type: string;
     created: string;
@@ -29,7 +29,7 @@ interface VerifiableCredential extends VCClaim {
   }[];
 }
 
-interface VCClaim {
+export interface VCClaim {
   "@context": string[];
   id: string;
   type: string[];
@@ -48,7 +48,7 @@ interface VCClaim {
   };
 }
 
-interface CredentialSubject {
+export interface CredentialSubject {
   id: string;
   achievement: {
     id: string;
@@ -72,7 +72,7 @@ interface CredentialSubject {
   }[];
 }
 
-interface JWS {
+export interface JWS {
   Header: string;
   Payload: string;
   Signature: string;
