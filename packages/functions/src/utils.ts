@@ -16,7 +16,7 @@ dotenv.config();
 const keypair = EthrDID.createKeyPair();
 const ethrDid = new EthrDID({ ...keypair });
 
-const filePath = "./assets/good.png";
+const filePath = "./assets/CertificateOfGraduation.png";
 const resolverBaseURL = "https://dev.uniresolver.io/1.0/identifiers/";
 
 /*
@@ -33,20 +33,20 @@ const providerConfig = {
  * @return {Promise<VerifiableCredential>} vc - return VC.
  */
 export const createVC = async (credentialSubject: CredentialSubject): Promise<VerifiableCredential> => {
-  const claim: Claim = {
+  const claim: VCClaim = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
       "https://w3id.org/openbadges/v3",
       "https://www.w3.org/ns/did/v1",
     ],
-    id: "credential-name-or-identifier",
+    id: "Keio University Certificate of Graduation",
     type: ["VerifiableCredential", "OpenBadge"],
     issuer: {
       id: ethrDid.did,
-      name: "masaki obayashi",
+      name: "Kohei Ito",
       image: "sample.png",
-      url: "masaki-university.com",
-      email: "masaki-univ@mu.ed.jp",
+      url: "https://www.keio.ac.jp/ja/about/president/history.html",
+      email: "sample@keio.ac.jp",
     },
     issuanceDate: new Date().toISOString(),
     credentialSubject,
@@ -68,7 +68,6 @@ export const createVC = async (credentialSubject: CredentialSubject): Promise<Ve
     },
   };
   const vc: VerifiableCredential = { ...claim, ...proof };
-  console.log(vc);
   return vc;
 };
 
@@ -95,32 +94,64 @@ export const bakingPNG = async (verifiableCredential: VerifiableCredential): Pro
 };
 
 export const verifyVC = async (base64Data: string): Promise<boolean> => {
-  const vc: VerifiableCredential = await getITXT(base64ToBuf(base64Data));
-  const claim: Claim = extractClaim(vc);
+  const vc: VerifiableCredential = await getVcFromBuf(base64ToBuf(base64Data));
+  const claim: VCClaim = extractVcClaim(vc);
   const verificationMethod = await didResolveGetVerificationMethods(vc.proof.verificationMethod);
   return verifyJWS(initJWSObj(vc.proof.jws), claim, verificationMethod);
 };
 
 /**
- * getiTxT from Buffer
+ * getVcFromBuf from Buffer
  * @param { Buffer } buf
  * @return { Promise<VerifiableCredential> } vc
  */
-export const getITXT = async (buf: Buffer): Promise<VerifiableCredential> => {
+export const getVcFromBuf = async (buf: Buffer): Promise<VerifiableCredential> => {
   let vc: VerifiableCredential = vcInit();
-  const readable = new stream.Readable();
-  readable.push(buf);
-  readable.push(null);
-  await readable.pipe(
-    pngitxt.get("openbadges", (err, buf) => {
-      if (!err && buf) {
-        vc = JSON.parse(buf.value);
-      } else {
-        console.error("Please input PNG file!");
-      }
-    })
-  );
-  return vc;
+  return new Promise((resolve) => {
+    const readable = new stream.Readable();
+    readable.push(buf);
+    readable.push(null);
+    readable.pipe(
+      pngitxt.get("openbadges", (err, buf) => {
+        if (!err && buf) {
+          vc = JSON.parse(buf.value);
+          resolve(vc);
+        } else {
+          console.error("Please input PNG file!");
+        }
+      })
+    );
+  });
+};
+
+export const verifyVP = async (vp: VerifiablePresentation): Promise<boolean> => {
+  const claim = extractVpClaim(vp);
+  const verificationMethod = await didResolveGetVerificationMethods(vp.proof.verificationMethod);
+  return verifyJWS(initJWSObj(vp.proof.jws), claim, verificationMethod);
+};
+
+/**
+ * getVcFromBuf from Buffer
+ * @param { Buffer } buf
+ * @return { Promise<VerifiableCredential> } vc
+ */
+export const getVpFromBuf = async (buf: Buffer): Promise<VerifiablePresentation> => {
+  let vp: VerifiablePresentation = vpInit();
+  return new Promise((resolve) => {
+    const readable = new stream.Readable();
+    readable.push(buf);
+    readable.push(null);
+    readable.pipe(
+      pngitxt.get("openbadges", (err, buf) => {
+        if (!err && buf) {
+          vp = JSON.parse(buf.value);
+          resolve(vp);
+        } else {
+          console.error("Please input PNG file!");
+        }
+      })
+    );
+  });
 };
 
 /**
@@ -160,8 +191,8 @@ export const base64ToBuf = (base64Data: string): Buffer => {
  * @param { VerifiableCredential } vc
  * @return { Claim } claim
  */
-const extractClaim = (vc: VerifiableCredential): Claim => {
-  const claim: Claim = {
+const extractVcClaim = (vc: VerifiableCredential): VCClaim => {
+  const claim: VCClaim = {
     "@context": vc["@context"],
     id: vc.id,
     type: vc.type,
@@ -171,6 +202,20 @@ const extractClaim = (vc: VerifiableCredential): Claim => {
     credentialStatus: vc.credentialStatus,
   };
   return claim;
+};
+
+/**
+ * Extract claim from vc
+ * @param { VerifiablePresentation } vp
+ * @return { VPClaim } vpClaim
+ */
+const extractVpClaim = (vp: VerifiablePresentation): VPClaim => {
+  const vpClaim: VPClaim = {
+    "@context": vp["@context"],
+    type: vp.type,
+    verifiableCredential: vp.verifiableCredential,
+  };
+  return vpClaim;
 };
 
 /**
@@ -219,4 +264,25 @@ const vcInit = (): VerifiableCredential => {
     },
   };
   return vc;
+};
+
+/**
+ * Initialize verifiable credentials
+ * @return { VerifiableCredential } vc
+ */
+const vpInit = (): VerifiablePresentation => {
+  const vp: VerifiablePresentation = {
+    "@context": [],
+    type: "",
+    verifiableCredential: [],
+    proof: {
+      type: "",
+      created: new Date().toISOString(),
+      proofPurpose: "",
+      verificationMethod: "",
+      domein: "",
+      jws: "",
+    },
+  };
+  return vp;
 };

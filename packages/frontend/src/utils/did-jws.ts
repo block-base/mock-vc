@@ -2,6 +2,8 @@ import * as didJWT from "did-jwt";
 import { VerificationMethod } from "did-resolver";
 import base64url from "base64url";
 
+import { JWS, VCClaim } from "../@types/utils-type";
+
 /**
  * Create JWS
  * @param {string} payload
@@ -23,7 +25,7 @@ export const CreateJWS = async (payload: string, privatekey: string): Promise<JW
  */
 export const verifyJWS = async (
   jws: JWS,
-  claim: VCClaim | VPClaim,
+  claim: VCClaim,
   verificationMethods: VerificationMethod[]
 ): Promise<boolean> => {
   jws.Payload = base64url(JSON.stringify(claim));
@@ -50,7 +52,7 @@ export const initJWSObj = (jws: string): JWS => {
     Payload: "",
     Signature: "",
   };
-  if (j?.length != 4) {
+  if (j?.length !== 4) {
     console.error("Couldn't Create JWS");
   } else {
     const jwsObj: JWS = {
@@ -79,6 +81,6 @@ export const JWSObjToStr = (jws: JWS): string => {
  * @return {string} jwsStr
  */
 export const JWSObjToStrWithoutPayload = (jws: JWS): string => {
-  const jwsStr = jws.Header + "." + "." + jws.Signature;
+  const jwsStr = jws.Header + ".." + jws.Signature;
   return jwsStr;
 };
