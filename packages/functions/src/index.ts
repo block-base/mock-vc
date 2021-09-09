@@ -1,8 +1,14 @@
 import * as functions from "firebase-functions";
-import { bakingPNG, createVC, verifyVC, verifyVP } from "./utils";
+import { EthrDID } from "ethr-did";
+import { verifyVP } from "./vp";
+import { bakingPNG, createVC, verifyVC } from "./vc";
 
 /* eslint-disable-next-line @typescript-eslint/no-var-requires */
 const cors = require("cors")({ origin: true });
+
+// DIDの秘密鍵と公開鍵のペアの作成
+const keypair = EthrDID.createKeyPair();
+const ethrDid = new EthrDID({ ...keypair });
 
 /**
  * claimからVCを作成
@@ -26,7 +32,11 @@ export const issue = functions.https.onRequest((request, response) => {
         },
       };
     };
-    const vc = await createVC(claim(request.body.did, "did:key:z6Mksm3hensaRNjXMyRWo95UPoDB7DDyZvvXUe6VKszaCJBv"));
+    const vc = await createVC(
+      claim(request.body.did, "did:key:z6Mksm3hensaRNjXMyRWo95UPoDB7DDyZvvXUe6VKszaCJBv"),
+      ethrDid,
+      keypair
+    );
     console.log(vc);
     const vcImg = `data:image/png;base64,${await bakingPNG(vc)}`;
     response.send({ vc: vcImg });
