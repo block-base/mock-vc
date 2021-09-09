@@ -51,7 +51,11 @@ const VCInfo = (props: Props) => {
           </thead>
           <tbody>
             <tr>
-              <td>ID</td>
+              <td>ID(Lerner DID)</td>
+              <td>{props.vc.credentialSubject.id}</td>
+            </tr>
+            <tr>
+              <td>Achievement ID</td>
               <td>{props.vc.credentialSubject.achievement.id}</td>
             </tr>
             <tr>
