@@ -55,7 +55,7 @@ interface CredentialSubject {
     type: string;
     name: string;
     description: string;
-    image: string;
+    image?: string;
     issuedOn: string;
     achievementType: string;
     creater: string;

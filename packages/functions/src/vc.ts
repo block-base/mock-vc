@@ -7,19 +7,19 @@ import base64url from "base64url";
 import { didResolveGetVerificationMethods } from "./utils";
 import { CreateJWS, verifyJWS, initJWSObj, JWSObjToStrWithoutPayload } from "./did-jws";
 
-const filePath = "./assets/CertificateOfGraduation.png";
-
 /**
  * Create Verifiable Credential
  * @param {CredentialSubject} credentialSubject
  * @param {EthrDID} ethrDid
  * @param {KeyPair} keypair
+ * @param {string} vcId
  * @return {Promise<VerifiableCredential>} vc - return VC.
  */
 export const createVC = async (
   credentialSubject: CredentialSubject,
   ethrDid: EthrDID,
-  keypair: KeyPair
+  keypair: KeyPair,
+  vcId: string
 ): Promise<VerifiableCredential> => {
   const claim: VCClaim = {
     "@context": [
@@ -27,7 +27,7 @@ export const createVC = async (
       "https://w3id.org/openbadges/v3",
       "https://www.w3.org/ns/did/v1",
     ],
-    id: "Keio University Certificate of Graduation",
+    id: vcId,
     type: ["VerifiableCredential", "OpenBadge"],
     issuer: {
       id: ethrDid.did,
@@ -62,9 +62,10 @@ export const createVC = async (
 /**
  * baking json-ld data to PNG.
  * @param {VerifiableCredential} verifiableCredential
+ * @param {string} filePath
  * @return {Promise<string>} base64Data - return PNG base64.
  */
-export const bakingPNG = async (verifiableCredential: VerifiableCredential): Promise<string> => {
+export const bakingPNG = async (verifiableCredential: VerifiableCredential, filePath: string): Promise<string> => {
   return new Promise((resolve) => {
     const st = fs
       .createReadStream(filePath)

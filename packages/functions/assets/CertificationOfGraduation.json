@@ -1,0 +1,41 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://w3id.org/openbadges/v3",
+    "https://www.w3.org/ns/did/v1"
+  ],
+  "id": "Keio University Certificate of Graduation",
+  "type": ["VerifiableCredential", "OpenBadge"],
+  "issuer": {
+    "id": "did:ethr:0x024e20b72f607218cdece85554e67478a0a271ea3f9ad90f6ef211ae59882d4b27",
+    "name": "Kohei Ito",
+    "image": "sample.png",
+    "url": "https://www.keio.ac.jp/ja/about/president/history.html",
+    "email": "sample@keio.ac.jp"
+  },
+  "issuanceDate": "2021-09-15T07:16:51.339Z",
+  "credentialSubject": {
+    "id": "did:ethr:0x02966e180359cada36eaa75492ab693f007a7189d9e5aecc90f34fcfd7e6ff7909",
+    "achievement": {
+      "id": "https://example.org/achievements/123",
+      "type": "Achievement",
+      "achievementType": "Certificate",
+      "name": "Keio University Certificate of Graduation",
+      "description": "This is certify that {Name} successfully completed the 4 years of study in the {Undergraduate} at Keio University.",
+      "image": "http://sample_image.png",
+      "issuedOn": "2021-03-23T07:21:17.186Z",
+      "creater": "did:key:z6Mksm3hensaRNjXMyRWo95UPoDB7DDyZvvXUe6VKszaCJBv"
+    }
+  },
+  "credentialStatus": {
+    "id": "0xdca7ef03e98e0dc2b855be647c39abe984fcf21b",
+    "type": "vcStatusRegistry2019"
+  },
+  "proof": {
+    "type": "EcdsaSecp256k1VerificationKey2019",
+    "created": "2021-09-15T07:16:51.349Z",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:ethr:0x024e20b72f607218cdece85554e67478a0a271ea3f9ad90f6ef211ae59882d4b27",
+    "jws": "eyJhbGciOiJFUzI1NksifQ..yG2fsMq1y6tHfbudBsdg7XfEzXgrMR2lib3xOwjqsemmDou_BMRse85PDgW795dXJzgv2v0ePEdRwySvj4Dl_Q"
+  }
+}

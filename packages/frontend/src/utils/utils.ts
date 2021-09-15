@@ -9,7 +9,7 @@ import base64url from "base64url";
  * create VP
  */
 export const createVP = async (
-  vc: VerifiableCredential,
+  vcs: VerifiableCredential[],
   privateKey: string,
   did: string
 ): Promise<VerifiablePresentation> => {
@@ -20,7 +20,7 @@ export const createVP = async (
       "https://www.w3.org/ns/did/v1",
     ],
     type: "VerifiablePresentation",
-    verifiableCredential: [vc],
+    verifiableCredential: vcs,
   };
   const jwsObj = await CreateJWS(base64url(JSON.stringify(vpClaim)), privateKey);
   const proof = {

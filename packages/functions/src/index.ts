@@ -14,7 +14,7 @@ const ethrDid = new EthrDID({ ...keypair });
  * claimからVCを作成
  * Base64にして返す
  */
-export const issue = functions.https.onRequest((request, response) => {
+export const issueGraduateCertification = functions.https.onRequest((request, response) => {
   cors(request, response, async () => {
     const claim = (learnerDid: string, createrDid: string): CredentialSubject => {
       return {
@@ -32,13 +32,47 @@ export const issue = functions.https.onRequest((request, response) => {
         },
       };
     };
+
     const vc = await createVC(
       claim(request.body.did, "did:key:z6Mksm3hensaRNjXMyRWo95UPoDB7DDyZvvXUe6VKszaCJBv"),
       ethrDid,
-      keypair
+      keypair,
+      "Keio University Certificate of Graduation"
     );
-    console.log(vc);
-    const vcImg = `data:image/png;base64,${await bakingPNG(vc)}`;
+    console.log(JSON.stringify(vc, null, 2));
+    const vcImg = `data:image/png;base64,${await bakingPNG(vc, "./assets/CertificateOfGraduation.png")}`;
+    response.send({ vc: vcImg });
+  });
+});
+
+/**
+ * claimからVCを作成
+ * Base64にして返す
+ */
+export const issueStudentCard = functions.https.onRequest((request, response) => {
+  cors(request, response, async () => {
+    const claim = (learnerDid: string, createrDid: string): CredentialSubject => {
+      return {
+        id: learnerDid,
+        achievement: {
+          id: "https://example.org/achievements/123",
+          type: "Achievement",
+          achievementType: "Certificate",
+          name: "Keio University Student Card",
+          description: "This is certify that Student at Keio University.",
+          image: "http://sample_image.png",
+          issuedOn: "2021-03-23T07:21:17.186Z",
+          creater: createrDid,
+        },
+      };
+    };
+    const vc = await createVC(
+      claim(request.body.did, "did:key:z6Mksm3hensaRNjXMyRWo95UPoDB7DDyZvvXUe6VKszaCJBv"),
+      ethrDid,
+      keypair,
+      "Keio University Certificate of Student"
+    );
+    const vcImg = `data:image/png;base64,${await bakingPNG(vc, "./assets/StudentCard.png")}`;
     response.send({ vc: vcImg });
   });
 });
@@ -62,6 +96,7 @@ export const verify = functions.https.onRequest((request, response) => {
 export const present = functions.https.onRequest((request, response) => {
   cors(request, response, async () => {
     const vp: VerifiablePresentation = request.body.vp;
+    console.log(vp);
     const result = await verifyVP(vp);
     console.log(result ? "VP Verified!" : "VP VerifyFailed!");
     response.send({ result });

@@ -14,37 +14,9 @@ const ethrDid = new EthrDID({ ...keypair });
 
 function App() {
   const [did, setDid] = React.useState("");
-  const [base64Vc, setbase64Vc] = React.useState("");
-  const [vc, setVc] = React.useState<VerifiableCredential>({
-    "@context": [],
-    id: "",
-    type: [],
-    issuer: {
-      id: "",
-    },
-    issuanceDate: "",
-    credentialSubject: {
-      id: "",
-      achievement: {
-        id: "string",
-        type: "string",
-        name: "string",
-        description: "string",
-        image: "string",
-        issuedOn: "string",
-        achievementType: "string",
-        creater: "string",
-      },
-    },
-    proof: {
-      type: "string",
-      created: "string",
-      proofPurpose: "string",
-      verificationMethod: "string",
-      jws: "string",
-    },
-  });
-  const [vcIsVerified, setVcIsVerified] = React.useState(false);
+  const [base64Vcs, setbase64Vc] = React.useState<string[]>([]);
+  const [vc, setVC] = React.useState<VerifiableCredential[]>([]);
+  const [vcIsVerified, setVcIsVerified] = React.useState<boolean[]>([]);
   const [vpIsVerified, setVpIsVerified] = React.useState(false);
 
   React.useEffect(() => {
@@ -55,28 +27,65 @@ function App() {
     setDid(ethrDid.did);
   };
 
-  const issue = async () => {
-    const response = await axios.post("http://localhost:5001/blockbase-vcmock-prod/us-central1/issue", { did });
-    const vcData = await getVC(response.data.vc);
-    setbase64Vc(response.data.vc);
-    setVc(vcData);
+  const issueGraduateCertification = async () => {
+    const response = await axios.post(
+      "http://localhost:5001/blockbase-vcmock-prod/us-central1/issueGraduateCertification",
+      { did }
+    );
+    setbase64Vc([...base64Vcs, response.data.vc]);
+    setVC([...vc, await getVC(response.data.vc)]);
   };
 
-  const verify = async () => {
-    if (base64Vc !== "") {
+  const issueStudentCard = async () => {
+    const response = await axios.post("http://localhost:5001/blockbase-vcmock-prod/us-central1/issueStudentCard", {
+      did,
+    });
+    setbase64Vc([...base64Vcs, response.data.vc]);
+    setVC([...vc, await getVC(response.data.vc)]);
+  };
+
+  const verify = async (index: number) => {
+    if (vc !== []) {
       const response = await axios.post("http://localhost:5001/blockbase-vcmock-prod/us-central1/verify", {
-        vc: base64Vc,
+        vc: base64Vcs[index],
       });
-      setVcIsVerified(response.data.result);
+      const vcIsVerifiedTmp = [...vcIsVerified];
+      vcIsVerifiedTmp[index] = response.data.result;
+      setVcIsVerified(vcIsVerifiedTmp);
     }
   };
 
-  // 一つのVCのみをVPにする
+  // VCをVPにする
   const present = async () => {
-    if (base64Vc !== "") {
+    if (vc !== []) {
       const vp = await createVP(vc, keypair.privateKey, did);
       const response = await axios.post("http://localhost:5001/blockbase-vcmock-prod/us-central1/present", { vp });
       setVpIsVerified(response.data.result);
+      console.log(vp);
+    }
+  };
+
+  const vcItems = (base64Vcs: string[]) => {
+    if (vc.length === base64Vcs.length) {
+      return (
+        <ul>
+          {base64Vcs.map((base64Vc, index) => (
+            <li key={index}>
+              No.{index + 1}
+              <img src={base64Vc} alt="vc" width="auto" height="300" />
+              <VCInfo vc={vc[index]} />
+              <div>
+                <h2>VCの検証</h2>
+                <button onClick={() => verify(index)}>VC検証</button>
+                <h3>VCの検証結果</h3>
+                <p>{vcIsVerified[index] ? "ok" : ""}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      );
+    } else {
+      return;
     }
   };
 
@@ -86,14 +95,10 @@ function App() {
       <p>{did}</p>
       <hr />
       <h2>VCの発行</h2>
-      <button onClick={issue}>発行</button>
+      <button onClick={issueGraduateCertification}>卒業証明書発行</button>
+      <button onClick={issueStudentCard}>学生証発行</button>
       <h2>VCの表示</h2>
-      {base64Vc && <img src={base64Vc} alt="vc" width="500" height="auto" />}
-      {base64Vc && <VCInfo vc={vc} />}
-      <h2>VCの検証</h2>
-      <button onClick={verify}>VC検証</button>
-      <h3>VCの検証結果</h3>
-      <p>{vcIsVerified && "ok"}</p>
+      {base64Vcs && vcItems(base64Vcs)}
       <hr />
       <h2>VPの検証</h2>
       <button onClick={present}>VP検証</button>
